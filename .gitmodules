@@ -1,0 +1,3 @@
+[submodule "dependences/Rosen_optimization"]
+	path = dependences/Rosen_optimization
+	url = https://github.com/mergarsal/Optimization.git
