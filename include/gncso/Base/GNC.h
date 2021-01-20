@@ -8,8 +8,13 @@
 
 #include "gncso/Base/BaseConcepts.h"
 #include "gncso/Base/Concepts.h"
+
+// loss functions
 #include "gncso/GM/GM_fcn.h"
 #include "gncso/TLS/TLS_fcn.h"
+#include "gncso/Tukey/Tukey_fcn.h"
+#include "gncso/Welsch/Welsch_fcn.h"
+
 
 // for the general fcns
 using namespace baseOpt;
@@ -122,16 +127,7 @@ GNC( const VariableEstimation<Variable, Weights, Args...>& estimate_model_fcn,
             // 3. Fix X and compute weights
             weights_proposed = update_weights_fcn(x_proposed, weights, residuals, mu, params, args...);
 
-            // 3.1 Check if we have enough data
-            set_inliers.setZero();  // clear
-            for (size_t i = 0; i < n; i++)    set_inliers(i) = (weights_proposed(i) > params.inliers_threshold);
-            // compute nr. of inliers
-            if (set_inliers.sum() < params.nr_min_points)
-            {
-                // we have less points than required!!
-                // OPtion 1: reset weights
-                weights_proposed = initial_weights;
-            }
+         
 
             // 3.2. Update params
             if (update_params_in_fcn)
@@ -177,7 +173,6 @@ GNC( const VariableEstimation<Variable, Weights, Args...>& estimate_model_fcn,
         mu_proposed = update_mu_fcn(mu, params, args...);
 
         // end of outer loop
-        // std::cout << weights << std::endl;
         // Record output
         outer_results.x = x;
         outer_results.f = f_x;
@@ -252,7 +247,7 @@ if ((result_gnc.GNCstatus == GNCStatus::MU_ZERO) || (result_gnc.GNCstatus == GNC
   result_gnc.weights = std::move(weights);
   result_gnc.set_inliers = std::move(set_inliers);
   result_gnc.mu = mu;
-  result_gnc.elapsed_time = 100;  // TODO: DO this
+  result_gnc.elapsed_time = 100;  // TODO: 
   result_gnc.nr_outer_iterations = i_outer_iter;
 }
   return result_gnc;
@@ -300,4 +295,55 @@ GMGNC( const VariableEstimation<Variable, Weights, Args...>& estimate_model_fcn,
             TLS::TLSInitializationMu<Weights, Scalar, Args...>, TLS::TLSUpdateWeights<Variable, Scalar, Weights, Args...>,
             TLS::TLSUpdateMu<Scalar, Args...>, initial_estimation_x, initial_weights, args..., update_params_in_fcn, initialize_variable_fcn, params);
           }
+          
+          
+          
+          
+
+ /*   Welsch    */
+
+            template <typename Variable, typename Weights, typename Scalar=double, typename... Args>
+            GNCResult<Variable, Weights, Scalar>
+            WelschGNC(    const VariableEstimation<Variable, Weights, Args...>& estimate_model_fcn,
+                          const ComputeCost<Variable, Weights, Scalar, Args...>& compute_cost_fcn,
+                          const ComputeResiduals<Variable, Weights, Args...>& compute_residuals_fcn,
+                          const Variable& initial_estimation_x,
+                          const Weights& initial_weights,
+                          Args &... args,
+                          const std::experimental::optional<UpdateParamsInProblem<Variable, Scalar, Weights, Args...>>& update_params_in_fcn = std::experimental::nullopt,
+                          const std::experimental::optional<InitializeVariableX<Variable, Scalar, Weights, Args...>> &initialize_variable_fcn = std::experimental::nullopt,
+                          const GNCParams<Scalar> & params = GNCParams<Scalar>())
+
+                {
+                  // Run GNC using GM
+                  return GNC<Variable, Weights, Scalar, Args...>  
+                  (estimate_model_fcn, compute_cost_fcn, compute_residuals_fcn,
+                  Welsch::WelschInitializationMu<Weights, Scalar, Args...>, Welsch::WelschUpdateWeights<Variable, Scalar, Weights, Args...>,
+                  Welsch::WelschUpdateMu<Scalar, Args...>, initial_estimation_x, initial_weights, args..., update_params_in_fcn, initialize_variable_fcn, params);
+                }
+
+
+/*   Tukey   */
+
+            template <typename Variable, typename Weights,  typename Scalar=double, typename... Args>
+            GNCResult<Variable, Weights, Scalar>
+            TukeyGNC(     const VariableEstimation<Variable, Weights, Args...>& estimate_model_fcn,
+                          const ComputeCost<Variable, Weights, Scalar, Args...>& compute_cost_fcn,
+                          const ComputeResiduals<Variable, Weights, Args...>& compute_residuals_fcn,
+                          const Variable& initial_estimation_x,
+                          const Weights& initial_weights,
+                          Args &... args,
+                          const std::experimental::optional<UpdateParamsInProblem<Variable, Scalar, Weights, Args...>>& update_params_in_fcn = std::experimental::nullopt,
+                          const std::experimental::optional<InitializeVariableX<Variable, Scalar, Weights, Args...>> &initialize_variable_fcn = std::experimental::nullopt,
+                          const GNCParams<Scalar> & params = GNCParams<Scalar>())
+
+                {
+                  // Run GNC using GM
+                  return GNC<Variable, Weights, Scalar, Args...>  
+                  (estimate_model_fcn, compute_cost_fcn, compute_residuals_fcn,
+                  Tukey::TukeyInitializationMu<Weights, Scalar, Args...>, Tukey::TukeyUpdateWeights<Variable, Scalar, Weights, Args...>,
+                  Tukey::TukeyUpdateMu<Scalar, Args...>, initial_estimation_x, initial_weights, args..., update_params_in_fcn, initialize_variable_fcn, params);
+                }
+
+          
 };  // end of gncso namespace

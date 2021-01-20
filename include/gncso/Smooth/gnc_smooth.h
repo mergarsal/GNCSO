@@ -49,9 +49,6 @@ Scalar baseUpdateMuInner(const Scalar& mu, const Scalar& id_inner, const GNCPara
 }
 
 
-// TODO: Create new GNCSmoothResult
-// TODO: add Riemannian data to result
-
 template <typename Variable, typename Weights, typename Tangent, typename Scalar=double, typename... Args>
 GNCResult<Variable, Weights, Scalar>
  GNCSmooth(const Optimization::Objective<Variable, Scalar, Args...> &f,
@@ -130,31 +127,12 @@ GNCResult<Variable, Weights, Scalar>
            if (params.GNC_verbose)    std::cout << "Mu initialized to " << mu << std::endl;
 
 
-          /*
-          weights_proposed = update_weights_fcn(x_proposed, initial_weights, residuals_sq, mu, params, args...);
-
-                   if (update_params_in_fcn)
-                   {  (*update_params_in_fcn)(x_proposed, weights_proposed, args...);  }
-
-                   // 4. Compute cost
-                   f_x_proposed = f(x_proposed, args...);
-
-                   */
+         
               x = std::move(x_proposed);
               weights = std::move(weights_proposed);
               f_x = f_x_proposed;
 
-           // Check if mu < 0
-           // if so, Break
-           /*
-           if (fabs(mu) < params.mu_threshold)
-           {
-             if (params.GNC_verbose)        std::cout << "Initial mu was close to threshold " << params.mu_threshold << std::endl;
-             result_gnc.GNCstatus = GNCStatus::MU_ZERO;
-           }
-
-           else
-           */
+        
            {
              
 
@@ -185,16 +163,11 @@ GNCResult<Variable, Weights, Scalar>
                    x_proposed = TNTResults.x;
                    // 2. Compute residuals_sq
 
-                   // TODO:
                    // save previous residuals
                    prev_residuals_sq = residuals_sq;
 
                    residuals_sq = compute_residuals_fcn_sq(x_proposed, args...);
 
-
-
-                   // 3. Compute cost
-                   // f_x_proposed = f(x_proposed, args...);
 
                    // 3. Fix X and compute weights
 
@@ -202,7 +175,7 @@ GNCResult<Variable, Weights, Scalar>
 
                    mu_weight = update_mu_inner_fcn(mu, i_inner_iter, params, args...);
                    // standard update
-                   // double mu_weight = mu / (i_inner_iter + 1);
+ 
 
                    weights_proposed = update_weights_fcn(x_proposed, weights, residuals_sq, mu_weight, params, args...);
 
@@ -227,51 +200,15 @@ GNCResult<Variable, Weights, Scalar>
                    Scalar n_inliers_before = set_inliers.sum();
 
                    for (size_t i = 0; i < n; i++)
-                    { // std::cout << "Weight: " << weights_proposed(i)  << std::endl;
                      set_inliers(i) = (weights_proposed(i) > params.inliers_threshold);
                     }
              
-                   /*
-                   if (n_inliers_before - set_inliers.sum() > 3)
-                   {
-                         std::cout << "Warning!! We discard more than 5 points in this iteration!!\n";
-                         x_proposed = (*initialize_variable_fcn)(x, weights, args...);
-                         // un-do the weights
-                         weights_proposed = initial_weights;
-                         // re-compute all inliers
-                          for (size_t i = 0; i < n; i++)
-                            { // std::cout << "Weight: " << weights_proposed(i)  << std::endl;
-                             set_inliers(i) = (weights_proposed(i) > params.inliers_threshold);
-                            }
-
-                   }
-
-                   */
+                   
                    if (set_inliers.sum() < params.nr_min_points )
                    {
-                       if (params.GNC_verbose)  std::cout << "We have " << set_inliers.sum() << " inliers!!!\nSetting all the weights to initial value\n";
+                       if (params.GNC_verbose)  std::cout << << "[WARNING] Run out of data!!\n" << "We have " << set_inliers.sum() << " inliers!";
                        // we have less points than required!!
-
-
-                       std::cout << "[WARNING] Run out of data!!\n---\n";
-                       break;
-                       // OPtion 1: reset weights
-                       weights_proposed = initial_weights;
-                       // x_proposed = initial_estimation_x;
-                       if (update_params_in_fcn)
-                        {  (*update_params_in_fcn)(x_proposed, weights_proposed, args...);  }
-                       mu = 60000;
-
-                       // for (size_t i = 0; weights_proposed.size(); i++)
-                       //   weights_proposed(i) = (double) std::rand() / ((double) RAND_MAX);
-                       //update again the params
-                       // x_proposed = initial_estimation_x;
-                       // residuals_sq = compute_residuals_fcn_sq(x_proposed, args...);
-
-                       // initialize mu
-                       // mu = initialize_mu_fcn(residuals_sq, params, args...);
-                       // weights_proposed = update_weights_fcn(x_proposed, weights, residuals_sq, mu, params, args...);
-                          // break;
+                       break;                       
 
                    }
 
@@ -305,21 +242,6 @@ GNCResult<Variable, Weights, Scalar>
 
                      break;  // end inner loop
                    }
-
-                   // Note that here, the params are already updated
-                   // 1.1. Re-initialize if needed
-                   // before calling the solver, you can compute your own Initialization (optional)
-                   // update estimation if required
-                   // highly recommended
-
-                   /*
-                   if (initialize_variable_fcn)
-                   {
-                     x = (*initialize_variable_fcn)(x, weights, args...);
-                   }
-                   */
-
-
 
 
                  }  // end each inner iteration
@@ -382,7 +304,6 @@ GNCResult<Variable, Weights, Scalar>
          }
          else   result_gnc.valid_estimation = true;
 
-         // std::cout << "Set inliers: " << set_inliers << std::endl;
          if (params.GNC_verbose) std::cout << "Running one last time the R-TNT\n";
          // Estimate variable one last time
          // 1.1 Update problem with set_inliers
@@ -406,8 +327,6 @@ GNCResult<Variable, Weights, Scalar>
 
          if ((result_gnc.GNCstatus == GNCStatus::MU_ZERO) || (result_gnc.GNCstatus == GNCStatus::CONVERGENCE_COST) || (result_gnc.GNCstatus == GNCStatus::USER_FUNCTION))
          {
-           // std::cout << "Saving data\n";
-
            // Save last results
            result_gnc.x = std::move(x_proposed);
            result_gnc.f = f_x_proposed;
@@ -481,36 +400,6 @@ GNCResult<Variable, Weights, Scalar>
                 }
 
 
-
-
-                            /*   temperature    */
-
-                            template <typename Variable, typename Weights, typename Tangent, typename Scalar=double, typename... Args>
-                            GNCResult<Variable, Weights, Scalar>
-                             TemperatureSmooth(
-                                             const Optimization::Objective<Variable, Scalar, Args...> &f,
-                                             const Optimization::Riemannian::QuadraticModel<Variable, Tangent, Args...> &QM,
-                                             const Optimization::Riemannian::RiemannianMetric<Variable, Tangent, Scalar, Args...> &metric,
-                                             const Optimization::Riemannian::Retraction<Variable, Tangent, Args...> &retract,
-                                             const ComputeResiduals<Variable, Weights, Args...>& compute_residuals_fcn_sq,
-                                             const Variable& initial_estimation_x,
-                                             const Weights& initial_weights,
-                                             Args &... args,
-                                             const std::experimental::optional<UpdateParamsInProblem<Variable, Scalar, Weights, Args...>>& update_params_in_fcn = std::experimental::nullopt,
-                                             const std::experimental::optional<InitializeVariableX<Variable, Scalar, Weights, Args...>> &initialize_variable_fcn = std::experimental::nullopt,
-                                             const std::experimental::optional<Optimization::Riemannian::LinearOperator<Variable, Tangent, Args...>> &precon = std::experimental::nullopt,
-                                             const GNCSmoothParams<Scalar> & params = GNCSmoothParams<Scalar>(),
-                                             const std::experimental::optional<Optimization::Riemannian::TNTUserFunction<Variable, Tangent, Scalar, Args...>> &user_function =
-                                                std::experimental::nullopt)
-
-                                {
-                                  std::cout << "\n---------------Inside  temperature function---------------\n";
-                                  // Run GNC using GM
-                                  return GNCSmooth<Variable, Weights, Tangent, Scalar, Args...>  (f, QM, metric, retract, compute_residuals_fcn_sq,
-                                  Temperature::TemperatureInitialization<Weights, Scalar, Args...>, Temperature::TemperatureUpdateWeights<Variable, Scalar, Weights, Args...>,
-                                  Temperature::TemperatureUpdate<Scalar, Args...>, baseUpdateMuInner<Scalar, Args...>, initial_estimation_x, initial_weights, args..., update_params_in_fcn, initialize_variable_fcn,
-                                  precon, params, user_function);
-                                }
 
 
  /*   Welsch    */

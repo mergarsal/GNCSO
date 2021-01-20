@@ -52,8 +52,6 @@ set(GNCSO_TOPLEVEL_DIR ${GNCSO_INCLUDE_DIR}/gncso)
 
 # The list of header files provided by this project
 set(GNCSO_HDRS
-    ${GNCSO_TOPLEVEL_DIR}/Refinement/Expansion/ExpansionInliers.h
-    ${GNCSO_TOPLEVEL_DIR}/Refinement/Base/Concepts.h
     ${GNCSO_TOPLEVEL_DIR}/Base/BaseConcepts.h
     ${GNCSO_TOPLEVEL_DIR}/Base/Concepts.h
     ${GNCSO_TOPLEVEL_DIR}/Base/GNC.h

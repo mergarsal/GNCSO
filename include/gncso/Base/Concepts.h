@@ -9,8 +9,6 @@
 
 namespace gncso {
 
-  // TODO: add explanation
-
 
   /** A lightweight struct containing a set of basic configuration parameters
    * for the GNC */
@@ -128,7 +126,7 @@ enum class GNCStatus
 
   ELAPSED_TIME,
 
-  USER_FUNCTION   // TODO: define this
+  USER_FUNCTION   
 };
 
 template <typename Variable, typename Weights, typename Scalar = double> struct GNCResult

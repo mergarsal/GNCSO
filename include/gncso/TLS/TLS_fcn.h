@@ -12,7 +12,8 @@ namespace TLS{
 template <typename Weights, typename Scalar = double, typename ...Args>
 Scalar TLSInitializationMu(const Weights & residuals, const GNCParams<Scalar> & params, Args &... args)
 {
-  return (1 / (2 * residuals.maxCoeff() / params.max_res_tol_sq - 1));
+  return 0.002; 
+  // return (1 / (2 * residuals.maxCoeff() / params.max_res_tol_sq - 1));
 }
 
 
@@ -31,7 +32,7 @@ Weights TLSUpdateWeights(const Variable &X, const Weights& prev_weights,
   Scalar th1, th2;
   th1 = (mu + 1) / mu * params.max_res_tol_sq;
   th2 = mu / (mu + 1) *  params.max_res_tol_sq;
-
+ 
   // for each observation
   for (size_t i = 0; i < N; i++)
   {
@@ -48,6 +49,7 @@ Weights TLSUpdateWeights(const Variable &X, const Weights& prev_weights,
             if (weights(i) < 0.0)   weights(i) = 0.0;
             if (weights(i) > 1.0)   weights(i) = 1.0;
     }
+    
   }
 
   return weights;
@@ -56,8 +58,7 @@ Weights TLSUpdateWeights(const Variable &X, const Weights& prev_weights,
 
  template <typename Scalar = double, typename... Args>
 Scalar TLSUpdateMu(const Scalar& prev_mu, const GNCParams<Scalar> & params, Args &... args)
-{
-
+{ 
   return (prev_mu * params.gnc_factor);
 }
 

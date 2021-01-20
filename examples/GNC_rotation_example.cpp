@@ -63,7 +63,7 @@ int main() {
 
    std::cout << "Test Rotation\n";
 
-   Scalar sigma_noise = 0.03;
+   Scalar sigma_noise = 0.01;
    Scalar sigma_outliers = 20;  // add outliers as high noise
    // random seed
    std::srand(std::time(nullptr));
@@ -115,7 +115,11 @@ int main() {
    {
     Scalar cost = 0;
     size_t N = weights.cols();
-    for (size_t i = 0; i < N; i ++)    cost += weights(i) * residuals_sq(i);
+    
+    for (size_t i = 0; i < N; i ++)    
+    {
+        cost += weights(i) * residuals_sq(i);
+    }    
     return (cost);
   };
 
@@ -180,7 +184,7 @@ int main() {
    std::cout << "Detected inliers: " << results_noise.set_inliers << std::endl;
 
   // Add outliers
-  size_t n_outliers = 4;
+  size_t n_outliers = 2;
 
   for (size_t i = 0; i < n_outliers; i++)
   {
@@ -202,9 +206,59 @@ int main() {
   std::cout << "Geodesic distance between both rotations: " << computeGeodesicDistance(R_ref, R_est) << std::endl;
   std::cout << "Detected inliers: " << results_outliers.set_inliers << std::endl;
   std::cout << "Final weights: " << results_outliers.weights << std::endl;
-
   
 
 
+  
+  /* Use Tukey */
+ // Solve the problem!!!
+  results_outliers = gncso::TukeyGNC<Matrix, Weights, Scalar, points_corr>(compute_svd_fcn, compute_cost_fcn, 
+                                                compute_residuals_fcn, R_init, weights_initial, points_str, 
+                                                std::experimental::nullopt, std::experimental::nullopt, options);
+  // extract solution
+  R_est = results_outliers.x;
+  std::cout << "-----------GNC + TUKEY --------------\n";
+  std::cout << "Result with " << n_outliers << " outliers\n------------\n";
+  std::cout << "Ground truth rotation matrix:\n" << R_ref << std::endl;
+  std::cout << "Estimated rotation matrix:\n" << R_est << std::endl;
+  std::cout << "Geodesic distance between both rotations: " << computeGeodesicDistance(R_ref, R_est) << std::endl;
+  std::cout << "Detected inliers: " << results_outliers.set_inliers << std::endl;
+  std::cout << "Final weights: " << results_outliers.weights << std::endl;
+  
+  
+  /* Use Welsch */
+  // Solve the problem!!!
+  results_outliers = gncso::WelschGNC<Matrix, Weights, Scalar, points_corr>(compute_svd_fcn, compute_cost_fcn, 
+                                                compute_residuals_fcn, R_init, weights_initial, points_str, 
+                                                std::experimental::nullopt, std::experimental::nullopt, options);
+  // extract solution
+  R_est = results_outliers.x;
+  std::cout << "-----------GNC + WELSCH --------------\n";
+  std::cout << "Result with " << n_outliers << " outliers\n------------\n";
+  std::cout << "Ground truth rotation matrix:\n" << R_ref << std::endl;
+  std::cout << "Estimated rotation matrix:\n" << R_est << std::endl;
+  std::cout << "Geodesic distance between both rotations: " << computeGeodesicDistance(R_ref, R_est) << std::endl;
+  std::cout << "Detected inliers: " << results_outliers.set_inliers << std::endl;
+  std::cout << "Final weights: " << results_outliers.weights << std::endl;
+
+
+
+  /* Use TLS */ 
+  // Solve the problem!!!
+  options.gnc_factor = 2.;
+  
+  results_outliers = gncso::TLSGNC<Matrix, Weights, Scalar, points_corr>(compute_svd_fcn, compute_cost_fcn, 
+                                                compute_residuals_fcn, R_init, weights_initial, points_str, 
+                                                std::experimental::nullopt, std::experimental::nullopt, options);
+  // extract solution
+  R_est = results_outliers.x;
+  std::cout << "-----------GNC + TLS --------------\n";
+  std::cout << "Result with " << n_outliers << " outliers\n------------\n";
+  std::cout << "Ground truth rotation matrix:\n" << R_ref << std::endl;
+  std::cout << "Estimated rotation matrix:\n" << R_est << std::endl;
+  std::cout << "Geodesic distance between both rotations: " << computeGeodesicDistance(R_ref, R_est) << std::endl;
+  std::cout << "Detected inliers: " << results_outliers.set_inliers << std::endl;
+  std::cout << "Final weights: " << results_outliers.weights << std::endl;
+  
 return 0;
 }
