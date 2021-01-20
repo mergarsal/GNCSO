@@ -201,12 +201,12 @@ GNCResult<Variable, Weights, Scalar>
 
                    for (size_t i = 0; i < n; i++)
                      set_inliers(i) = (weights_proposed(i) > params.inliers_threshold);
-                    }
+                   
              
                    
                    if (set_inliers.sum() < params.nr_min_points )
                    {
-                       if (params.GNC_verbose)  std::cout << << "[WARNING] Run out of data!!\n" << "We have " << set_inliers.sum() << " inliers!";
+                       if (params.GNC_verbose)  std::cout << "[WARNING] Run out of data!!\n" << "We have " << set_inliers.sum() << " inliers!";
                        // we have less points than required!!
                        break;                       
 
