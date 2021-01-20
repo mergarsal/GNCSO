@@ -73,7 +73,7 @@ GNCResult<Variable, Weights, Scalar>
            std::cout << "---------------Inside GNC-RTNT function---------------\n";
            // Output struct
 
-           GNCResult<Variable, Weights, Scalar> result_gnc;
+           GNCResult<Variable, Weights, Scalar> result_gnc = GNCResult<Variable, Weights, Scalar>();
            result_gnc.GNCstatus = GNCStatus::ITERATION_LIMIT;
 
            // Current iterate and proposed next iterates;
@@ -289,17 +289,16 @@ GNCResult<Variable, Weights, Scalar>
          }  // end of if: mu != 0
 
 
-          std::cout << "Finding inliers last round\n";
          if (params.GNC_verbose) std::cout << "Finding inliers\n";
          // Find inliers
          set_inliers.setZero();
          for (size_t i = 0; i < n; i++)
          set_inliers(i) = (weights(i) > params.inliers_threshold);
-         std::cout << "Number of inliers: " << set_inliers.sum() << std::endl;
+         if (params.GNC_verbose)  std::cout << "Number of inliers: " << set_inliers.sum() << std::endl;
 
          if (set_inliers.sum() < params.nr_min_points)
          {
-                std::cout << "We obtained less points than you need for the estimation!!\n";
+                if (params.GNC_verbose)  std::cout << "We obtained less points than you need for the estimation!!\n";
                 result_gnc.valid_estimation = false;
          }
          else   result_gnc.valid_estimation = true;

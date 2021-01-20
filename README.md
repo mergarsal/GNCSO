@@ -37,7 +37,7 @@ Note: This library wraps around the [Optimization library](https://github.com/da
 
 * Optimization (own fork)
  ```
-        https://github.com/mergarsal/Optimization.git
+        git clone https://github.com/mergarsal/Optimization.git
 
  ```
 
