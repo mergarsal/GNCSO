@@ -7,7 +7,7 @@ Code associated to the paper:
 
 **Authors:** [Mercedes Garcia-Salguero](http://mapir.uma.es/mapirwebsite/index.php/people/290), [Javier Gonzalez-Jimenez](http://mapir.isa.uma.es/mapirwebsite/index.php/people/95-javier-gonzalez-jimenez)
 
-**License:** [GPLv3](https://raw.githubusercontent.com/mergarsal/GNCSO/main/LICENSE.txt)
+**License:** [GPLv3](https://raw.githubusercontent.com/mergarsal/GNCSO/main/LICENSE)
 
 
 If you use this code for your research, please cite:

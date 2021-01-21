@@ -36,7 +36,7 @@ GNC( const VariableEstimation<Variable, Weights, Args...>& estimate_model_fcn,
      const std::experimental::optional<InitializeVariableX<Variable, Scalar, Weights, Args...>> &initialize_variable_fcn = std::experimental::nullopt,
      const GNCParams<Scalar> & params = GNCParams<Scalar>())
      {
-       std::cout << "---------------Inside GNC function---------------\n";
+     if (params.GNC_verbose)     std::cout << "---------------Inside GNC function---------------\n";
 
     // Output struct
     GNCResult<Variable, Weights, Scalar> result_gnc;
@@ -52,14 +52,19 @@ GNC( const VariableEstimation<Variable, Weights, Args...>& estimate_model_fcn,
 
     Scalar mu, mu_proposed;
 
+    size_t n = initial_weights.size();
+    
+    
     // Weights at the current iterate
     Weights weights, weights_proposed;
+    weights_proposed.setZero(1, n); 
 
     // Residuals at the current iterate
     Weights residuals;
+    residuals.setZero(1, n);
 
     // Define var. for inliers
-    size_t n = weights.size();
+    
     Weights set_inliers;
     set_inliers.setZero(1, n);
 
@@ -98,7 +103,7 @@ GNC( const VariableEstimation<Variable, Weights, Args...>& estimate_model_fcn,
     else
     {
       // run outer iteration
-      std::cout << "###############\nStarting GNC\n###############\n";
+      if (params.GNC_verbose)   std::cout << "###############\nStarting GNC\n###############\n";
 
       for (i_outer_iter = 0; i_outer_iter < params.max_outer_iterations; i_outer_iter++)
       {
@@ -109,8 +114,8 @@ GNC( const VariableEstimation<Variable, Weights, Args...>& estimate_model_fcn,
         // Run inner loop
         for (i_inner_iter = 0; i_inner_iter < params.max_inner_iterations; i_inner_iter++)
         {
-            std::cout << "Outer iter: " << i_outer_iter << "               mu: " << mu;
-            std::cout << "                    Inner iter: " << i_inner_iter << std::endl;
+            if (params.GNC_verbose)   std::cout << "Outer iter: " << i_outer_iter << "               mu: " << mu;
+            if (params.GNC_verbose)   std::cout << "                    Inner iter: " << i_inner_iter << std::endl;
 
             // Note that here the parameters are already saved!
             // 1.0 Initialize variable if required
