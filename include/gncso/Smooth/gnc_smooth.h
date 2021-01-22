@@ -90,7 +90,7 @@ GNCResult<Variable, Weights, Scalar>
            Weights weights, weights_proposed;
 
            // residuals_sq at the current iterate
-           Weights residuals_sq, prev_residuals_sq;
+           Weights residuals_sq;
 
            size_t n = initial_weights.rows();
            Weights set_inliers;
@@ -163,8 +163,6 @@ GNCResult<Variable, Weights, Scalar>
                    x_proposed = TNTResults.x;
                    // 2. Compute residuals_sq
 
-                   // save previous residuals
-                   prev_residuals_sq = residuals_sq;
 
                    residuals_sq = compute_residuals_fcn_sq(x_proposed, args...);
 
@@ -189,16 +187,8 @@ GNCResult<Variable, Weights, Scalar>
                    f_x_proposed = f(x_proposed, args...);
                    diff_costs = fabs(f_x - f_x_proposed);
 
-                   double sum_abs = 0;
-                   for (size_t j = 0; j < n; j++)
-                   {
-                        sum_abs += fabs(prev_residuals_sq(j) - residuals_sq(j));
-                   }
-                   
-
-
-                   Scalar n_inliers_before = set_inliers.sum();
-
+                                   
+                   // TODO: add option to control this stop
                    for (size_t i = 0; i < n; i++)
                      set_inliers(i) = (weights_proposed(i) > params.inliers_threshold);
                    
