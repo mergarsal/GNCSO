@@ -3,7 +3,7 @@
 Header-based library for robust estimation: 
 Graduated Non-Convexity + Black-Rangarajan duality. 
 Code associated to the paper: 
-[Fast and Robust Relative Pose Estimation for Calibrated Cameras](ADD ARXIV) 
+[Fast and Robust Relative Pose Estimation for Calibrated Cameras](http://arxiv.org/abs/2101.08524) 
 
 **Authors:** [Mercedes Garcia-Salguero](http://mapir.uma.es/mapirwebsite/index.php/people/290), [Javier Gonzalez-Jimenez](http://mapir.isa.uma.es/mapirwebsite/index.php/people/95-javier-gonzalez-jimenez)
 
@@ -11,11 +11,20 @@ Code associated to the paper:
 
 
 If you use this code for your research, please cite:
+
 ```
-ADD OURS
+@misc{garciasalguero2021fast,
+      title={Fast and Robust Certifiable Estimation of the Relative Pose Between Two Calibrated Cameras}, 
+      author={Mercedes Garcia-Salguero and Javier Gonzalez-Jimenez},
+      year={2021},
+      eprint={2101.08524},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
 ```
 
 Note: This library wraps around the [Optimization library](https://github.com/david-m-rosen/Optimization.git)
+
 ```
         @article{rosen2019se,
           title={SE-Sync: A certifiably correct algorithm for synchronization over the special Euclidean group},
