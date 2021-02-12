@@ -12,12 +12,10 @@
 #include "gncso/Base/Concepts.h"
 #include "gncso/GM/GM_fcn.h"
 #include "gncso/TLS/TLS_fcn.h"
-#include "gncso/Temperature/temperature.h"
 #include "gncso/Welsch/Welsch_fcn.h"
 #include "gncso/Tukey/Tukey_fcn.h"
 
 // Smooth
-// #include "Optimization/Convex/Concepts.h"
 #include "Optimization/Riemannian/TNT.h"
 #include "Optimization/Riemannian/Concepts.h"
 
