@@ -94,7 +94,8 @@ Matrix9 constructDataMatrix(const points_corr & bearing_vectors, const Weights &
                 for (int j = 0; j < 3; j++)    temp.block<3, 1>(j*3, 1) = v1[j] * v0;
                 C += weight * temp * temp.transpose();
         }
-        return 0.5 * (C + C.transpose());
+        Matrix9 Cf = 0.5 * (C + C.transpose());
+        return (Cf);
 }
 
 
@@ -156,8 +157,8 @@ int main() {
       // force the solution to have SVD with rotation matrices
       if (U.determinant() < 0)    U.col(2) *= -1;
       if (V.determinant() < 0)    V.col(2) *= -1;
-
-      return (U * d * (V).transpose());
+      Matrix E_final = (U * d * (V).transpose());
+      return E_final;
    };
 
    // Define the cost function
@@ -213,7 +214,7 @@ int main() {
    std::cout << "Result without outliers\n------------\n";
    std::cout << "Ground truth essential matrix:\n" << E_ref << std::endl;
    std::cout << "Estimated essential matrix:\n" << E_est << std::endl;
-   std::cout << "Number of detected inliers: " << (results.set_inliers).size() << std::endl;
+   std::cout << "Number of detected inliers: " << (results.set_inliers).sum() << std::endl;
 
    // Add noise
 
@@ -243,7 +244,7 @@ int main() {
    std::cout << "Result with noise " << sigma_noise << "\n------------\n";
    std::cout << "Ground truth essential matrix:\n" << E_ref << std::endl;
    std::cout << "Estimated essential matrix:\n" << E_est << std::endl;
-   std::cout << "Number of detected inliers: " << (results_noise.set_inliers).size() << std::endl;
+   std::cout << "Number of detected inliers: " << (results_noise.set_inliers).sum() << std::endl;
 
 
   // Add outliers
@@ -268,7 +269,7 @@ int main() {
   std::cout << "Result with " << n_outliers << " outliers\n------------\n";
   std::cout << "Ground truth essential matrix:\n" << E_ref << std::endl;
   std::cout << "Estimated essential matrix:\n" << E_est << std::endl;
-  std::cout << "Number of detected inliers: " << (results_outliers.set_inliers).size() << std::endl;
+  std::cout << "Number of detected inliers: " << (results_outliers.set_inliers).sum() << std::endl;
 
   
 
